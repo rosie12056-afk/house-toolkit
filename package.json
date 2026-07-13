@@ -1,6 +1,6 @@
 {
   "name": "house-toolkit",
-  "version": "0.3.0-rc.2",
+  "version": "0.3.0-rc.3",
   "description": "Local auditing and conformance tools for persistent agent systems.",
   "type": "module",
   "license": "Apache-2.0",

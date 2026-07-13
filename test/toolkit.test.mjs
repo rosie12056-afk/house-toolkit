@@ -187,7 +187,7 @@ test("runtime client candidate conformance requires two clients and rejects forg
       },
       async getEvidence(runId) {
         const run = runs.get(runId);
-        return run ? { evidence_bundle_id: run.result.evidence_bundle_id } : null;
+        return run ? { bundle_id: run.result.evidence_bundle_id } : null;
       },
       async getInitiative(runId) {
         return runs.has(runId) ? { initiative_id: `initiative:${prefix}:1` } : null;

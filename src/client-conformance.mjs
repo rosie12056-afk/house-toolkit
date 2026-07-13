@@ -51,7 +51,7 @@ export async function runRuntimeClientConformance({ createClients } = {}) {
       const run = await client.getRun(submitted.run_id);
       if (run?.run_id !== submitted.run_id || run?.result?.evidence_bundle_id == null) throw new Error("completed Run is not readable with Evidence linkage");
       const evidence = await client.getEvidence(submitted.run_id);
-      if (evidence?.evidence_bundle_id !== run.result.evidence_bundle_id) throw new Error("Evidence readback does not match the completed Run");
+      if (evidence?.bundle_id !== run.result.evidence_bundle_id) throw new Error("Evidence readback does not match the completed Run");
       const initiative = await client.getInitiative(submitted.run_id);
       if (initiative?.initiative_id == null) throw new Error("Initiative readback is missing");
       const memories = await client.queryMemories({ subjectId: "agent:lantern", limit: 20, includeQuarantined: false });
