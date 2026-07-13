@@ -7,7 +7,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 import { scanPrivacy } from "../src/privacy-scan.mjs";
-import { runLifecycleConformance, runMigrationConformance } from "../src/conformance.mjs";
+import { runLifecycleConformance, runMemoryPortConformance, runMigrationConformance } from "../src/conformance.mjs";
 import { formatSarifReport, lintProtocol } from "../src/protocol-lint.mjs";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -96,6 +96,70 @@ test("lifecycle conformance validates the shared journal, dream, and handoff fix
   const report = runLifecycleConformance(join(protocolsRoot, "fixtures", "v0.2", "lifecycle-contracts.json"));
   assert.equal(report.ok, true);
   assert.equal(report.summary.records_checked, 5);
+});
+
+test("memory port candidate conformance covers async, durability, isolation, and atomic append", async () => {
+  const state = { memories: new Map(), memoryOperations: new Map(), resignatures: new Map(), resignatureOperations: new Map() };
+  const factory = async () => ({
+    async health() { return { ok: true }; },
+    async putMemory({ operationId, runId, memory }) {
+      if (state.memoryOperations.has(operationId)) return structuredClone(state.memoryOperations.get(operationId));
+      const stored = { ...structuredClone(memory), run_id: runId };
+      state.memories.set(memory.memory_id, stored);
+      state.memoryOperations.set(operationId, stored);
+      return structuredClone(stored);
+    },
+    async queryMemories({ subjectId, limit, includeQuarantined = false }) {
+      return [...state.memories.values()]
+        .filter((item) => item.subject_id === subjectId && (includeQuarantined || item.status === "active"))
+        .sort((a, b) => b.created_at.localeCompare(a.created_at))
+        .slice(0, limit)
+        .map((item) => structuredClone(item));
+    },
+    async appendResignature({ operationId, runId, expectedPreviousId, resignature }) {
+      if (state.resignatureOperations.has(operationId)) return structuredClone(state.resignatureOperations.get(operationId));
+      const latest = [...state.resignatures.values()]
+        .filter((item) => item.subject_id === resignature.subject_id)
+        .sort((a, b) => b.layer - a.layer || b.created_at.localeCompare(a.created_at))[0] || null;
+      if ((latest?.resignature_id || null) !== expectedPreviousId) {
+        const error = new Error("resignature head changed");
+        error.code = "E_RESIGNATURE_CONFLICT";
+        throw error;
+      }
+      const stored = { ...structuredClone(resignature), run_id: runId };
+      state.resignatures.set(resignature.resignature_id, stored);
+      state.resignatureOperations.set(operationId, stored);
+      return structuredClone(stored);
+    },
+    async latestResignature({ subjectId }) {
+      return (await this.queryResignatures({ subjectId, limit: 1 }))[0] || null;
+    },
+    async queryResignatures({ subjectId, limit }) {
+      return [...state.resignatures.values()]
+        .filter((item) => item.subject_id === subjectId)
+        .sort((a, b) => b.layer - a.layer || b.created_at.localeCompare(a.created_at))
+        .slice(0, limit)
+        .map((item) => structuredClone(item));
+    },
+  });
+  const report = await runMemoryPortConformance({ createPort: factory, reopenPort: factory });
+  assert.equal(report.ok, true, JSON.stringify(report));
+  assert.equal(report.summary.checks_run, 8);
+});
+
+test("memory port candidate conformance rejects a non-atomic resignature adapter", async () => {
+  const records = [];
+  const broken = async () => ({
+    async health() { return { ok: true }; },
+    async queryMemories() { return []; },
+    async putMemory() {},
+    async latestResignature() { return records.at(-1) || null; },
+    async queryResignatures() { return records.toReversed(); },
+    async appendResignature({ resignature }) { records.push(structuredClone(resignature)); },
+  });
+  const report = await runMemoryPortConformance({ createPort: broken, reopenPort: broken });
+  assert.equal(report.ok, false);
+  assert.equal(report.checks.find((check) => check.code === "M07_ATOMIC_RESIGNATURE_APPEND").ok, false);
 });
 
 test("lifecycle lint rejects a dream recast as fact and an unsupported journal observation", () => {

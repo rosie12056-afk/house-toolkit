@@ -4,6 +4,8 @@ House Toolkit provides local auditing and conformance commands for persistent ag
 
 This repository is experimental. The v0.2 exit codes and report formats are compatibility surfaces; individual detection rules may become stricter when fixtures and release notes explain the change.
 
+The `t4-portability` branch is an unreleased v0.3 candidate. Its module API includes an asynchronous Memory Port conformance suite; it does not change the released v0.2 command line.
+
 ## House open-source stack
 
 The three repositories form one explicit chain:
@@ -22,6 +24,8 @@ This repository is the checking layer. It does not start agents or decide instan
 - `house-memory-boundary-lint`: rejects unsupported memory promotion and high-risk delete or export decisions without confirmation.
 - `house-conformance`: validates retained `0.1` records together with their explicit `0.2` migrations.
 - `house-lifecycle-lint`: validates Life State, Opportunity, Journal, Dream, and Handoff records without judging an agent's writing style.
+
+The module export `runMemoryPortConformance()` verifies a candidate adapter's asynchronous API, idempotent writes, subject isolation, quarantine filtering, return-value isolation, reopen durability, and atomic Resignature append behavior. It requires a stale append to fail with `E_RESIGNATURE_CONFLICT`.
 
 Protocol commands accept `--profile 0.1` or `--profile 0.2`. Omitting it selects the profile declared by the document; no version is silently coerced.
 

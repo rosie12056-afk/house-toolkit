@@ -8,12 +8,12 @@ For the five-repository dependency timeline, see the canonical [House Ecosystem 
 | --- | --- | --- | --- | --- |
 | v0.1 | Released | Privacy scan, Evidence lint, Initiative lint, stable exit codes, JSON reports, and fictional fixtures | Gives maintainers small checks they can add without adopting House Runtime | Repository maintainers and CI users |
 | v0.2 | Released; additive lifecycle lint enters through patch release candidates | Memory-boundary lint, lifecycle lint, full protocol conformance profiles, fixture selection, repository publication profile, and optional SARIF output | Detects unsafe memory promotion and prevents journal or dream records from crossing evidence boundaries | Memory-system and Runtime implementers |
-| v0.3 | After Runtime `alpha.2` and the first external fixture set | Migration audit, adapter conformance, policy-diff reports, baseline/suppression files with expiry, and a composed release audit command | Helps larger projects upgrade without turning suppressions into permanent blind spots | Multi-adapter projects and release engineers |
+| v0.3 | Candidate work on `t4-portability`; release still gated | Asynchronous Memory Port conformance, migration audit, policy-diff reports, baseline/suppression files with expiry, and a composed release audit command | Proves adapter portability and helps larger projects upgrade without turning suppressions into permanent blind spots | Multi-adapter projects and release engineers |
 
 ## Release gates
 
 - v0.2 does not ship until it validates both retained v0.1 fixtures and the Protocols v0.2 release-candidate fixtures.
-- v0.3 does not ship until at least one non-Runtime fixture set proves the commands are not coupled to House's demo structure.
+- v0.3 does not ship until SQLite and a second durable Memory Adapter pass the same conformance suite, and at least one non-Runtime fixture set proves the commands are not coupled to House's demo structure.
 - Scanner rules remain local-only and never receive credentials or upload inspected content.
 - A lint result remains evidence of a rule match, not proof that a repository is completely safe.
 

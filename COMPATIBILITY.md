@@ -9,6 +9,7 @@ House Toolkit `v0.2.1` depends on the exact Git tag `house-protocols#v0.2.1`. It
 | `v0.1.1` | exact `v0.1.1` | `0.1` | 20, 22, 24 | Tested |
 | `v0.2.0` | exact `v0.2.0` | separate `0.1` and `0.2` profiles | 20, 22, 24 | Tested and released |
 | `v0.2.1` | exact `v0.2.1` | `0.1`, `0.2`, and lifecycle fixture conformance | 20, 22, 24 | Tested and released |
+| `v0.3.0-rc.0` branch candidate | exact `v0.2.1` | v0.2 records plus Memory Port candidate behavior | 20, 22, 24 | Unreleased; requires two independent durable adapters |
 
 ## Upgrade rules
 
