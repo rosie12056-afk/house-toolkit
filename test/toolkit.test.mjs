@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -7,7 +7,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 import { scanPrivacy } from "../src/privacy-scan.mjs";
-import { runMigrationConformance } from "../src/conformance.mjs";
+import { runLifecycleConformance, runMigrationConformance } from "../src/conformance.mjs";
 import { formatSarifReport, lintProtocol } from "../src/protocol-lint.mjs";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -92,6 +92,27 @@ test("migration conformance validates the Protocols v0.1-to-v0.2 fixture set", (
   assert.equal(report.summary.records_checked, 7);
 });
 
+test("lifecycle conformance validates the shared journal, dream, and handoff fixtures", () => {
+  const report = runLifecycleConformance(join(protocolsRoot, "fixtures", "v0.2", "lifecycle-contracts.json"));
+  assert.equal(report.ok, true);
+  assert.equal(report.summary.records_checked, 5);
+});
+
+test("lifecycle lint rejects a dream recast as fact and an unsupported journal observation", () => {
+  const fixture = JSON.parse(readFileSync(join(protocolsRoot, "fixtures", "v0.2", "lifecycle-contracts.json"), "utf8"));
+  const dir = mkdtempSync(join(tmpdir(), "house-toolkit-lifecycle-"));
+  const dream = structuredClone(fixture.records.find((item) => item.kind === "dream_record").document);
+  const journal = structuredClone(fixture.records.find((item) => item.kind === "journal_entry").document);
+  dream.factuality = "observed";
+  journal.events[0].evidence_refs = [];
+  writeFileSync(join(dir, "dream.json"), JSON.stringify(dream));
+  writeFileSync(join(dir, "journal.json"), JSON.stringify(journal));
+  const dreamReport = lintProtocol("dream_record", [join(dir, "dream.json")], { cwd: root, profile: "0.2" });
+  const journalReport = lintProtocol("journal_entry", [join(dir, "journal.json")], { cwd: root, profile: "0.2" });
+  assert.equal(dreamReport.ok, false);
+  assert.equal(journalReport.files[0].semantic_errors[0].code, "E_JOURNAL_OBSERVATION_WITHOUT_EVIDENCE");
+});
+
 test("SARIF output preserves stable rule codes without source values", () => {
   const report = lintProtocol("memory_policy_decision", ["test/fixtures/memory/invalid-ungrounded-promotion.json"], { cwd: root, profile: "0.2" });
   const sarif = formatSarifReport(report);
@@ -144,4 +165,18 @@ test("conformance and memory-boundary CLIs return stable exit codes", () => {
   assert.equal(JSON.parse(conformance.stdout).summary.records_checked, 7);
   assert.equal(boundary.status, 1);
   assert.equal(JSON.parse(boundary.stdout).files[0].semantic_errors[0].code, "E_MEMORY_PROMOTION_WITHOUT_EVIDENCE");
+});
+
+test("lifecycle conformance and lint CLIs are independently runnable", () => {
+  const lifecycle = join(protocolsRoot, "fixtures", "v0.2", "lifecycle-contracts.json");
+  const fixture = JSON.parse(readFileSync(lifecycle, "utf8"));
+  const dir = mkdtempSync(join(tmpdir(), "house-toolkit-lifecycle-cli-"));
+  const journal = fixture.records.find((item) => item.kind === "journal_entry").document;
+  const journalPath = join(dir, "journal.json");
+  writeFileSync(journalPath, JSON.stringify(journal));
+  const conformance = run("conformance.mjs", ["lifecycle", lifecycle, "--json"]);
+  const lint = run("lifecycle-lint.mjs", ["journal_entry", journalPath, "--json"]);
+  assert.equal(conformance.status, 0);
+  assert.equal(JSON.parse(conformance.stdout).summary.records_checked, 5);
+  assert.equal(lint.status, 0);
 });
