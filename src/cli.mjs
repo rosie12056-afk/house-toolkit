@@ -1,10 +1,12 @@
 import { readTermFile } from "./files.mjs";
 
 export function parseArgs(argv, { privacy = false } = {}) {
-  const options = { inputs: [], excludes: [], json: false, help: false, englishOnly: false };
+  const options = { inputs: [], excludes: [], json: false, sarif: false, help: false, englishOnly: false };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     if (arg === "--json") options.json = true;
+    else if (!privacy && arg === "--sarif") options.sarif = true;
+    else if (!privacy && arg === "--profile") options.profile = requireValue(argv, ++index, arg);
     else if (arg === "--help" || arg === "-h") options.help = true;
     else if (privacy && arg === "--english-only") options.englishOnly = true;
     else if (privacy && arg === "--exclude") options.excludes.push(requireValue(argv, ++index, arg));
@@ -13,6 +15,7 @@ export function parseArgs(argv, { privacy = false } = {}) {
     else if (arg.startsWith("-")) throw new Error(`Unknown option: ${arg}`);
     else options.inputs.push(arg);
   }
+  if (options.json && options.sarif) throw new Error("--json and --sarif cannot be used together");
   return options;
 }
 

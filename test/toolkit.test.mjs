@@ -7,9 +7,11 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 import { scanPrivacy } from "../src/privacy-scan.mjs";
-import { lintProtocol } from "../src/protocol-lint.mjs";
+import { runMigrationConformance } from "../src/conformance.mjs";
+import { formatSarifReport, lintProtocol } from "../src/protocol-lint.mjs";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
+const protocolsRoot = resolve(dirname(fileURLToPath(import.meta.resolve("house-protocols"))), "..");
 
 function run(bin, args) {
   return spawnSync(process.execPath, [resolve(root, "bin", bin), ...args], {
@@ -70,6 +72,34 @@ test("evidence lint accepts source-backed fictional evidence", () => {
   assert.equal(report.ok, true);
 });
 
+test("an explicit profile rejects a document from another protocol version", () => {
+  const report = lintProtocol("evidence", ["test/fixtures/evidence/valid.json"], { cwd: root, profile: "0.2" });
+  assert.equal(report.ok, false);
+  assert.equal(report.files[0].schema_errors[0].code, "E_PROTOCOL_PROFILE_MISMATCH");
+});
+
+test("memory boundary lint rejects ungrounded promotion and accepts source-backed promotion", () => {
+  const invalid = lintProtocol("memory_policy_decision", ["test/fixtures/memory/invalid-ungrounded-promotion.json"], { cwd: root, profile: "0.2" });
+  const valid = lintProtocol("memory_policy_decision", ["test/fixtures/memory/valid-source-backed-promotion.json"], { cwd: root, profile: "0.2" });
+  assert.equal(invalid.ok, false);
+  assert.equal(invalid.files[0].semantic_errors[0].code, "E_MEMORY_PROMOTION_WITHOUT_EVIDENCE");
+  assert.equal(valid.ok, true);
+});
+
+test("migration conformance validates the Protocols v0.1-to-v0.2 fixture set", () => {
+  const report = runMigrationConformance(join(protocolsRoot, "fixtures", "migrations", "v0.1-to-v0.2.json"));
+  assert.equal(report.ok, true);
+  assert.equal(report.summary.records_checked, 7);
+});
+
+test("SARIF output preserves stable rule codes without source values", () => {
+  const report = lintProtocol("memory_policy_decision", ["test/fixtures/memory/invalid-ungrounded-promotion.json"], { cwd: root, profile: "0.2" });
+  const sarif = formatSarifReport(report);
+  assert.equal(sarif.version, "2.1.0");
+  assert.equal(sarif.runs[0].results[0].ruleId, "E_MEMORY_PROMOTION_WITHOUT_EVIDENCE");
+  assert.equal(JSON.stringify(sarif).includes("model_suggested"), false);
+});
+
 test("initiative lint rejects a completion claim without work and evidence", () => {
   const result = run("initiative-lint.mjs", ["test/fixtures/initiative/invalid-completed.json", "--json"]);
   assert.equal(result.status, 1);
@@ -104,4 +134,14 @@ test("a directory without JSON documents returns exit code 2", () => {
   const result = run("evidence-lint.mjs", [dir]);
   assert.equal(result.status, 2);
   assert.match(result.stderr, /no JSON files were found/);
+});
+
+test("conformance and memory-boundary CLIs return stable exit codes", () => {
+  const migration = join(protocolsRoot, "fixtures", "migrations", "v0.1-to-v0.2.json");
+  const conformance = run("conformance.mjs", ["migration", migration, "--json"]);
+  const boundary = run("memory-boundary-lint.mjs", ["test/fixtures/memory/invalid-ungrounded-promotion.json", "--profile", "0.2", "--json"]);
+  assert.equal(conformance.status, 0);
+  assert.equal(JSON.parse(conformance.stdout).summary.records_checked, 7);
+  assert.equal(boundary.status, 1);
+  assert.equal(JSON.parse(boundary.stdout).files[0].semantic_errors[0].code, "E_MEMORY_PROMOTION_WITHOUT_EVIDENCE");
 });

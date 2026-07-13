@@ -1,0 +1,16 @@
+{
+  "protocol_version": "0.2",
+  "decision_id": "decision:fictional:source-backed",
+  "operation": "promote",
+  "subject_id": "agent:lantern",
+  "resource_ref": {
+    "ref_id": "memory:fictional:source-backed",
+    "kind": "memory",
+    "locator": "memories/fictional-source-backed"
+  },
+  "source_class": "public_external",
+  "decision": "allow",
+  "reason_codes": ["source_recorded"],
+  "evidence_refs": ["evidence:fictional:source-backed"],
+  "decided_at": "2032-04-05T10:00:00.000Z"
+}

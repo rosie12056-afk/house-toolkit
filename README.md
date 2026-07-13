@@ -2,7 +2,7 @@
 
 House Toolkit provides local auditing and conformance commands for persistent agent systems. It validates evidence boundaries, initiative completion, and repository privacy without starting an agent runtime or uploading inspected files.
 
-This repository is experimental. Its exit codes and JSON report format are part of the v0.1 compatibility surface; individual detection rules may become stricter.
+This repository is experimental. Exit codes and report formats are compatibility surfaces; individual detection rules may become stricter when fixtures and release notes explain the change.
 
 ## House open-source stack
 
@@ -19,8 +19,10 @@ This repository is the checking layer. It does not start agents or decide instan
 - `house-privacy-scan`: finds likely secrets, personal paths, email addresses, private network endpoints, forbidden file types, configured deny terms, and optional non-English public content.
 - `house-evidence-lint`: validates House Evidence Bundles and rejects external facts supported only by model output.
 - `house-initiative-lint`: validates House Initiative Records and rejects completion without a successful action, an output or result, and linked evidence.
+- `house-memory-boundary-lint`: rejects unsupported memory promotion and high-risk delete or export decisions without confirmation.
+- `house-conformance`: validates retained `0.1` records together with their explicit `0.2` migrations.
 
-The evidence and initiative commands consume [House Protocols](https://github.com/rosie12056-afk/house-protocols) v0.1 documents.
+Protocol commands accept `--profile 0.1` or `--profile 0.2`. Omitting it selects the profile declared by the document; no version is silently coerced.
 
 ## Five-minute check
 
@@ -30,6 +32,7 @@ npm test
 
 node ./bin/evidence-lint.mjs test/fixtures/evidence/valid.json
 node ./bin/initiative-lint.mjs test/fixtures/initiative/invalid-completed.json --json
+node ./bin/memory-boundary-lint.mjs test/fixtures/memory/valid-source-backed-promotion.json --profile 0.2
 node ./bin/privacy-scan.mjs . --exclude test/fixtures/privacy/invalid.txt --english-only
 ```
 
@@ -39,7 +42,7 @@ All commands return:
 - exit code `1` when findings or validation errors exist;
 - exit code `2` for invalid arguments, unreadable input, or malformed JSON.
 
-Use `--json` for a machine-readable report. Reports identify files, line numbers, and rule codes but never print a detected secret value.
+Use `--json` for a machine-readable report or `--sarif` on protocol lint commands for code-scanning integration. Reports identify files, line numbers, and rule codes but never print a detected secret value.
 
 ## Privacy scan options
 
@@ -71,7 +74,7 @@ The deny-term and allow-text files are read locally and are not copied into repo
 npm run check
 ```
 
-See [ROADMAP.md](ROADMAP.md), [COMPATIBILITY.md](COMPATIBILITY.md), [CONTRIBUTING.md](CONTRIBUTING.md), and [SECURITY.md](SECURITY.md).
+See [PUBLICATION-PROFILE.md](PUBLICATION-PROFILE.md), [ROADMAP.md](ROADMAP.md), [COMPATIBILITY.md](COMPATIBILITY.md), [CONTRIBUTING.md](CONTRIBUTING.md), and [SECURITY.md](SECURITY.md).
 
 ## License
 

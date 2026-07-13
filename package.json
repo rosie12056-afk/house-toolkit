@@ -1,6 +1,6 @@
 {
   "name": "house-toolkit",
-  "version": "0.1.1",
+  "version": "0.2.0-rc.1",
   "description": "Local auditing and conformance tools for persistent agent systems.",
   "type": "module",
   "license": "Apache-2.0",
@@ -8,7 +8,9 @@
   "bin": {
     "house-privacy-scan": "./bin/privacy-scan.mjs",
     "house-evidence-lint": "./bin/evidence-lint.mjs",
-    "house-initiative-lint": "./bin/initiative-lint.mjs"
+    "house-initiative-lint": "./bin/initiative-lint.mjs",
+    "house-memory-boundary-lint": "./bin/memory-boundary-lint.mjs",
+    "house-conformance": "./bin/conformance.mjs"
   },
   "files": [
     "bin",
@@ -16,6 +18,7 @@
     "README.md",
     "ROADMAP.md",
     "COMPATIBILITY.md",
+    "PUBLICATION-PROFILE.md",
     "LICENSE",
     "NOTICE"
   ],
@@ -25,7 +28,7 @@
     "check": "npm test && npm run scan:self"
   },
   "dependencies": {
-    "house-protocols": "github:rosie12056-afk/house-protocols#v0.1.1"
+    "house-protocols": "github:rosie12056-afk/house-protocols#v0.2.0-rc.1"
   },
   "engines": {
     "node": ">=20"
