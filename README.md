@@ -4,7 +4,7 @@ House Toolkit provides local auditing and conformance commands for persistent ag
 
 This repository is experimental. The v0.2 exit codes and report formats are compatibility surfaces; individual detection rules may become stricter when fixtures and release notes explain the change.
 
-The `t4-portability` branch is an unreleased v0.3 candidate. Its module API includes an asynchronous Memory Port conformance suite; it does not change the released v0.2 command line.
+The v0.3 release candidate adds asynchronous Memory Port and transport-neutral Runtime client conformance. It does not change the released v0.2 command-line compatibility line.
 
 ## House open-source stack
 

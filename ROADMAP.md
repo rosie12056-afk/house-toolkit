@@ -8,7 +8,7 @@ For the five-repository dependency timeline, see the canonical [House Ecosystem 
 | --- | --- | --- | --- | --- |
 | v0.1 | Released | Privacy scan, Evidence lint, Initiative lint, stable exit codes, JSON reports, and fictional fixtures | Gives maintainers small checks they can add without adopting House Runtime | Repository maintainers and CI users |
 | v0.2 | Released; additive lifecycle lint enters through patch release candidates | Memory-boundary lint, lifecycle lint, full protocol conformance profiles, fixture selection, repository publication profile, and optional SARIF output | Detects unsafe memory promotion and prevents journal or dream records from crossing evidence boundaries | Memory-system and Runtime implementers |
-| v0.3 | Candidate work on `t4-portability`; release still gated | Asynchronous Memory Port conformance, migration audit, policy-diff reports, baseline/suppression files with expiry, and a composed release audit command | Proves adapter portability and helps larger projects upgrade without turning suppressions into permanent blind spots | Multi-adapter projects and release engineers |
+| v0.3 | RC after two adapter and two client implementations pass candidate conformance; stable release remains gated | Asynchronous Memory Port and Runtime client conformance, migration audit, policy-diff reports, baseline/suppression files with expiry, and a composed release audit command | Proves adapter and client portability and helps larger projects upgrade without turning suppressions into permanent blind spots | Multi-adapter projects and release engineers |
 
 ## Release gates
 
