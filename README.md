@@ -22,7 +22,7 @@ This repository is the checking layer. It does not start agents or decide instan
 - `house-evidence-lint`: validates House Evidence Bundles and rejects external facts supported only by model output.
 - `house-initiative-lint`: validates House Initiative Records and rejects completion without a successful action, an output or result, and linked evidence.
 - `house-memory-boundary-lint`: rejects unsupported memory promotion and high-risk delete or export decisions without confirmation.
-- `house-conformance`: validates retained `0.1` records together with their explicit `0.2` migrations.
+- `house-conformance`: validates retained `0.1` migrations, lifecycle records, and transport-neutral Runtime API fixtures.
 - `house-lifecycle-lint`: validates Life State, Opportunity, Journal, Dream, and Handoff records without judging an agent's writing style.
 
 The module export `runMemoryPortConformance()` verifies a candidate adapter's asynchronous API, idempotent writes, subject isolation, quarantine filtering, return-value isolation, reopen durability, and atomic Resignature append behavior. It requires a stale append to fail with `E_RESIGNATURE_CONFLICT`.
@@ -41,6 +41,7 @@ node ./bin/evidence-lint.mjs test/fixtures/evidence/valid.json
 node ./bin/initiative-lint.mjs test/fixtures/initiative/invalid-completed.json --json
 node ./bin/memory-boundary-lint.mjs test/fixtures/memory/valid-source-backed-promotion.json --profile 0.2
 node ./bin/conformance.mjs lifecycle node_modules/house-protocols/fixtures/v0.2/lifecycle-contracts.json
+node ./bin/conformance.mjs runtime-api node_modules/house-protocols/fixtures/v0.2/runtime-api.json
 node ./bin/privacy-scan.mjs . --exclude test/fixtures/privacy/invalid.txt --english-only
 ```
 

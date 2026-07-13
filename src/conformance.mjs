@@ -54,6 +54,33 @@ export function runLifecycleConformance(path) {
   };
 }
 
+export function runRuntimeApiConformance(path) {
+  let fixture;
+  try {
+    fixture = JSON.parse(readFileSync(path, "utf8"));
+  } catch (error) {
+    return { schema_version: "1", tool: "house-conformance", profile: "runtime-api:0.2", ok: false, input_error: true, records: [], error: error.message };
+  }
+  if (!Array.isArray(fixture?.records)) {
+    return { schema_version: "1", tool: "house-conformance", profile: "runtime-api:0.2", ok: false, input_error: true, records: [], error: "expected a Runtime API records fixture" };
+  }
+  const allowed = new Set(["runtime_request", "runtime_response"]);
+  const records = fixture.records.map((record, index) => {
+    const result = allowed.has(record.kind)
+      ? validateProtocol(record.kind, record.document, { profile: "0.2" })
+      : { ok: false, schema_errors: [{ code: "E_PROTOCOL_KIND_UNKNOWN", message: `Unsupported Runtime API kind: ${record.kind}` }], semantic_errors: [] };
+    return { index, kind: record.kind, ok: result.ok, result };
+  });
+  return {
+    schema_version: "1",
+    tool: "house-conformance",
+    profile: "runtime-api:0.2",
+    ok: records.length > 0 && records.every((record) => record.ok),
+    records,
+    summary: { records_checked: records.length, records_failed: records.filter((record) => !record.ok).length },
+  };
+}
+
 const MEMORY_PORT_METHODS = Object.freeze([
   "health",
   "queryMemories",

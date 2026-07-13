@@ -7,7 +7,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 import { scanPrivacy } from "../src/privacy-scan.mjs";
-import { runLifecycleConformance, runMemoryPortConformance, runMigrationConformance } from "../src/conformance.mjs";
+import { runLifecycleConformance, runMemoryPortConformance, runMigrationConformance, runRuntimeApiConformance } from "../src/conformance.mjs";
 import { runRuntimeClientConformance } from "../src/client-conformance.mjs";
 import { formatSarifReport, lintProtocol } from "../src/protocol-lint.mjs";
 
@@ -97,6 +97,12 @@ test("lifecycle conformance validates the shared journal, dream, and handoff fix
   const report = runLifecycleConformance(join(protocolsRoot, "fixtures", "v0.2", "lifecycle-contracts.json"));
   assert.equal(report.ok, true);
   assert.equal(report.summary.records_checked, 5);
+});
+
+test("Runtime API conformance validates the shared transport-neutral fixtures", () => {
+  const report = runRuntimeApiConformance(join(protocolsRoot, "fixtures", "v0.2", "runtime-api.json"));
+  assert.equal(report.ok, true);
+  assert.equal(report.summary.records_checked, 4);
 });
 
 test("memory port candidate conformance covers async, durability, isolation, and atomic append", async () => {
@@ -287,4 +293,11 @@ test("lifecycle conformance and lint CLIs are independently runnable", () => {
   assert.equal(conformance.status, 0);
   assert.equal(JSON.parse(conformance.stdout).summary.records_checked, 5);
   assert.equal(lint.status, 0);
+});
+
+test("Runtime API conformance CLI is independently runnable", () => {
+  const fixture = join(protocolsRoot, "fixtures", "v0.2", "runtime-api.json");
+  const result = run("conformance.mjs", ["runtime-api", fixture, "--json"]);
+  assert.equal(result.status, 0);
+  assert.equal(JSON.parse(result.stdout).summary.records_checked, 4);
 });
