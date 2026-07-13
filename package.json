@@ -1,0 +1,39 @@
+{
+  "name": "house-toolkit",
+  "version": "0.1.0",
+  "description": "Local auditing and conformance tools for persistent agent systems.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "private": false,
+  "bin": {
+    "house-privacy-scan": "./bin/privacy-scan.mjs",
+    "house-evidence-lint": "./bin/evidence-lint.mjs",
+    "house-initiative-lint": "./bin/initiative-lint.mjs"
+  },
+  "files": [
+    "bin",
+    "src",
+    "README.md",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "scripts": {
+    "test": "node --test",
+    "scan:self": "node ./bin/privacy-scan.mjs . --exclude node_modules --exclude .git --exclude test/fixtures/privacy/invalid.txt --english-only",
+    "check": "npm test && npm run scan:self"
+  },
+  "dependencies": {
+    "house-protocols": "github:rosie12056-afk/house-protocols#v0.1.1"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rosie12056-afk/house-toolkit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rosie12056-afk/house-toolkit/issues"
+  },
+  "homepage": "https://github.com/rosie12056-afk/house-toolkit#readme"
+}

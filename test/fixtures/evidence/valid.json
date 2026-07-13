@@ -1,0 +1,28 @@
+{
+  "protocol_version": "0.1",
+  "bundle_id": "evidence:weather-report:1",
+  "created_at": "2032-04-05T09:30:00.000Z",
+  "claims": [
+    {
+      "claim_id": "claim:weather-report:1",
+      "claim_type": "external_fact",
+      "statement": "The fictional station reported rain.",
+      "truth_confidence": 0.8,
+      "status": "supported"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "evidence-item:weather-report:1",
+      "supports_claim_ids": ["claim:weather-report:1"],
+      "evidence_type": "source_document",
+      "source_ref": {
+        "ref_id": "source:fictional-weather-report",
+        "kind": "source",
+        "locator": "fixtures/fictional-weather-report.json"
+      },
+      "observed_at": "2032-04-05T09:20:00.000Z",
+      "retrieval_confidence": 0.95
+    }
+  ]
+}

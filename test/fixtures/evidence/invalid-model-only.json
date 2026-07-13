@@ -1,0 +1,28 @@
+{
+  "protocol_version": "0.1",
+  "bundle_id": "evidence:unsupported-weather:1",
+  "created_at": "2032-04-05T09:30:00.000Z",
+  "claims": [
+    {
+      "claim_id": "claim:unsupported-weather:1",
+      "claim_type": "external_fact",
+      "statement": "It rained in the fictional city.",
+      "truth_confidence": 0.99,
+      "status": "supported"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "evidence-item:model-output:1",
+      "supports_claim_ids": ["claim:unsupported-weather:1"],
+      "evidence_type": "model_output",
+      "source_ref": {
+        "ref_id": "event:model-output:1",
+        "kind": "event",
+        "locator": "events/model-output-1"
+      },
+      "observed_at": "2032-04-05T09:20:00.000Z",
+      "retrieval_confidence": 1
+    }
+  ]
+}

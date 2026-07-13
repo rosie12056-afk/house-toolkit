@@ -1,0 +1,2 @@
+Contact: fictional.person@example.test
+Local material: /Users/example/private/material.txt
