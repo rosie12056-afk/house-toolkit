@@ -43,6 +43,22 @@ test("privacy scan does not mistake a Git SSH URL for a personal email address",
   assert.equal(report.findings.some((item) => item.code === "P_EMAIL_ADDRESS"), false);
 });
 
+test("privacy scan does not mistake a JavaScript db property for a database file", () => {
+  const dir = mkdtempSync(join(tmpdir(), "house-toolkit-db-property-"));
+  const material = join(dir, "store.mjs");
+  writeFileSync(material, "this.db.prepare('SELECT 1');\n");
+  const report = scanPrivacy([material], { cwd: dir });
+  assert.equal(report.ok, true);
+});
+
+test("privacy scan rejects an actual database file", () => {
+  const dir = mkdtempSync(join(tmpdir(), "house-toolkit-db-file-"));
+  const material = join(dir, "runtime.db");
+  writeFileSync(material, "not a real database\n");
+  const report = scanPrivacy([material], { cwd: dir });
+  assert.equal(report.findings[0].code, "P_FORBIDDEN_FILE_TYPE");
+});
+
 test("evidence lint rejects an external fact supported only by model output", () => {
   const report = lintProtocol("evidence", ["test/fixtures/evidence/invalid-model-only.json"], { cwd: root });
   assert.equal(report.ok, false);

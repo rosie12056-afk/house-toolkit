@@ -24,7 +24,6 @@ const checks = Object.freeze([
   { code: "P_BEARER_TOKEN", regex: /\bAuthorization\s*:\s*Bearer\s+[A-Za-z0-9._~-]{16,}/iu },
   { code: "P_CREDENTIAL_ASSIGNMENT", regex: /\b(?:api[_-]?key|access[_-]?token|auth[_-]?token|cookie|password|secret)\b\s*[:=]\s*["'][^"']{12,}["']/iu },
   { code: "P_PRIVATE_PROMPT", regex: /\b(?:private|system)[_-]?prompt\b\s*[:=]/iu },
-  { code: "P_DATABASE_REFERENCE", regex: /\b[^\s"']+\.(?:db|sqlite|sqlite3)\b/iu },
 ]);
 
 function isEnvironmentFile(file) {
