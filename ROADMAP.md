@@ -2,6 +2,8 @@
 
 House Toolkit turns House Protocols trust boundaries into local, repeatable checks. Releases are gated by protocol fixtures and public-clone verification rather than calendar dates.
 
+For the five-repository dependency timeline, see the canonical [House Ecosystem Roadmap](https://github.com/rosie12056-afk/house-protocols/blob/main/ECOSYSTEM-ROADMAP.md).
+
 | Milestone | Target gate | What it adds | Problem solved | Primary users |
 | --- | --- | --- | --- | --- |
 | v0.1 | Released | Privacy scan, Evidence lint, Initiative lint, stable exit codes, JSON reports, and fictional fixtures | Gives maintainers small checks they can add without adopting House Runtime | Repository maintainers and CI users |
