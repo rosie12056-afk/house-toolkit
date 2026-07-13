@@ -4,6 +4,16 @@ House Toolkit provides local auditing and conformance commands for persistent ag
 
 This repository is experimental. Its exit codes and JSON report format are part of the v0.1 compatibility surface; individual detection rules may become stricter.
 
+## House open-source stack
+
+The three repositories form one explicit chain:
+
+1. **[House Protocols](https://github.com/rosie12056-afk/house-protocols)** defines what records mean and which trust boundaries must hold.
+2. **[House Toolkit](https://github.com/rosie12056-afk/house-toolkit)** turns those boundaries into local and CI checks.
+3. **[House Runtime](https://github.com/rosie12056-afk/house-runtime)** executes durable work under the validated contracts.
+
+This repository is the checking layer. It does not start agents or decide instance policy. See [ROADMAP.md](ROADMAP.md) and [COMPATIBILITY.md](COMPATIBILITY.md).
+
 ## Included commands
 
 - `house-privacy-scan`: finds likely secrets, personal paths, email addresses, private network endpoints, forbidden file types, configured deny terms, and optional non-English public content.
@@ -61,7 +71,7 @@ The deny-term and allow-text files are read locally and are not copied into repo
 npm run check
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md).
+See [ROADMAP.md](ROADMAP.md), [COMPATIBILITY.md](COMPATIBILITY.md), [CONTRIBUTING.md](CONTRIBUTING.md), and [SECURITY.md](SECURITY.md).
 
 ## License
 
