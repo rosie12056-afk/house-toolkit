@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 import { scanPrivacy } from "../src/privacy-scan.mjs";
 import { runLifecycleConformance, runMemoryPortConformance, runMigrationConformance } from "../src/conformance.mjs";
+import { runRuntimeClientConformance } from "../src/client-conformance.mjs";
 import { formatSarifReport, lintProtocol } from "../src/protocol-lint.mjs";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -160,6 +161,49 @@ test("memory port candidate conformance rejects a non-atomic resignature adapter
   const report = await runMemoryPortConformance({ createPort: broken, reopenPort: broken });
   assert.equal(report.ok, false);
   assert.equal(report.checks.find((check) => check.code === "M07_ATOMIC_RESIGNATURE_APPEND").ok, false);
+});
+
+test("runtime client candidate conformance requires two clients and rejects forged auth fields", async () => {
+  function clientFactory(prefix) {
+    const runs = new Map();
+    return {
+      async health() { return { ok: true, runtime_version: "fictional-test" }; },
+      async submit(input) {
+        const existing = [...runs.values()].find((run) => run.idempotency_key === input.idempotencyKey);
+        if (existing) return structuredClone(existing);
+        const run = { run_id: `run:${prefix}:${runs.size + 1}`, idempotency_key: input.idempotencyKey, status: "completed", result: { evidence_bundle_id: `evidence:${prefix}:1` } };
+        runs.set(run.run_id, run);
+        return structuredClone(run);
+      },
+      async getRun(runId) { return structuredClone(runs.get(runId) || null); },
+      async queryMemories() { return []; },
+      async request(method, params) {
+        if (Object.keys(params || {}).some((key) => ["authenticated_by", "auth", "token", "principal"].includes(key))) {
+          const error = new Error("reserved authentication field");
+          error.code = "E_RESERVED_AUTH_FIELD";
+          throw error;
+        }
+        if (method === "run.get") return this.getRun(params.runId);
+        const error = new Error("method not found");
+        error.code = "E_METHOD_NOT_FOUND";
+        throw error;
+      },
+    };
+  }
+  const report = await runRuntimeClientConformance({
+    createClients: async () => [
+      { name: "fictional-direct", client: clientFactory("direct") },
+      { name: "fictional-json", client: clientFactory("json") },
+    ],
+  });
+  assert.equal(report.ok, true, JSON.stringify(report));
+  assert.equal(report.summary.clients_checked, 2);
+});
+
+test("runtime client candidate conformance rejects a single implementation", async () => {
+  const report = await runRuntimeClientConformance({ createClients: async () => [{ name: "only", client: {} }] });
+  assert.equal(report.ok, false);
+  assert.equal(report.input_error, true);
 });
 
 test("lifecycle lint rejects a dream recast as fact and an unsupported journal observation", () => {

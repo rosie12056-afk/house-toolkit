@@ -27,6 +27,8 @@ This repository is the checking layer. It does not start agents or decide instan
 
 The module export `runMemoryPortConformance()` verifies a candidate adapter's asynchronous API, idempotent writes, subject isolation, quarantine filtering, return-value isolation, reopen durability, and atomic Resignature append behavior. It requires a stale append to fail with `E_RESIGNATURE_CONFLICT`.
 
+The module export `runRuntimeClientConformance()` requires two independently configured clients to prove health, idempotent submission, Evidence-linked readback, memory queries, stable method errors, and rejection of client-supplied authentication fields.
+
 Protocol commands accept `--profile 0.1` or `--profile 0.2`. Omitting it selects the profile declared by the document; no version is silently coerced.
 
 ## Five-minute check
