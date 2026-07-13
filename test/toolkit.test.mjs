@@ -102,7 +102,7 @@ test("lifecycle conformance validates the shared journal, dream, and handoff fix
 test("Runtime API conformance validates the shared transport-neutral fixtures", () => {
   const report = runRuntimeApiConformance(join(protocolsRoot, "fixtures", "v0.2", "runtime-api.json"));
   assert.equal(report.ok, true);
-  assert.equal(report.summary.records_checked, 4);
+  assert.equal(report.summary.records_checked, 7);
 });
 
 test("memory port candidate conformance covers async, durability, isolation, and atomic append", async () => {
@@ -182,6 +182,16 @@ test("runtime client candidate conformance requires two clients and rejects forg
         return structuredClone(run);
       },
       async getRun(runId) { return structuredClone(runs.get(runId) || null); },
+      async listRuns({ status, limit = 20 } = {}) {
+        return [...runs.values()].filter((run) => !status || run.status === status).slice(0, limit).map((run) => structuredClone(run));
+      },
+      async getEvidence(runId) {
+        const run = runs.get(runId);
+        return run ? { evidence_bundle_id: run.result.evidence_bundle_id } : null;
+      },
+      async getInitiative(runId) {
+        return runs.has(runId) ? { initiative_id: `initiative:${prefix}:1` } : null;
+      },
       async queryMemories() { return []; },
       async request(method, params) {
         if (Object.keys(params || {}).some((key) => ["authenticated_by", "auth", "token", "principal"].includes(key))) {
@@ -299,5 +309,5 @@ test("Runtime API conformance CLI is independently runnable", () => {
   const fixture = join(protocolsRoot, "fixtures", "v0.2", "runtime-api.json");
   const result = run("conformance.mjs", ["runtime-api", fixture, "--json"]);
   assert.equal(result.status, 0);
-  assert.equal(JSON.parse(result.stdout).summary.records_checked, 4);
+  assert.equal(JSON.parse(result.stdout).summary.records_checked, 7);
 });

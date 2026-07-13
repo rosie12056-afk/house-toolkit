@@ -4,7 +4,7 @@ House Toolkit provides local auditing and conformance commands for persistent ag
 
 This repository is experimental. The v0.2 exit codes and report formats are compatibility surfaces; individual detection rules may become stricter when fixtures and release notes explain the change.
 
-The v0.3 release candidate adds asynchronous Memory Port and transport-neutral Runtime client conformance. It does not change the released v0.2 command-line compatibility line.
+The v0.3 release candidate adds asynchronous Memory Port and transport-neutral Runtime client conformance. RC2 requires clients to list Runs and read linked Evidence and Initiative records in addition to the RC1 surface. It does not change the released v0.2 command-line compatibility line.
 
 ## House open-source stack
 
@@ -27,7 +27,7 @@ This repository is the checking layer. It does not start agents or decide instan
 
 The module export `runMemoryPortConformance()` verifies a candidate adapter's asynchronous API, idempotent writes, subject isolation, quarantine filtering, return-value isolation, reopen durability, and atomic Resignature append behavior. It requires a stale append to fail with `E_RESIGNATURE_CONFLICT`.
 
-The module export `runRuntimeClientConformance()` requires two independently configured clients to prove health, idempotent submission, Evidence-linked readback, memory queries, stable method errors, and rejection of client-supplied authentication fields.
+The module export `runRuntimeClientConformance()` requires two independently configured clients to prove health, idempotent submission, Run listing, Evidence and Initiative readback, memory queries, stable method errors, and rejection of client-supplied authentication fields.
 
 Protocol commands accept `--profile 0.1` or `--profile 0.2`. Omitting it selects the profile declared by the document; no version is silently coerced.
 

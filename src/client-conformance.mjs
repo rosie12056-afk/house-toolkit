@@ -1,4 +1,13 @@
-const CLIENT_METHODS = Object.freeze(["health", "submit", "getRun", "queryMemories", "request"]);
+const CLIENT_METHODS = Object.freeze([
+  "health",
+  "submit",
+  "listRuns",
+  "getRun",
+  "getEvidence",
+  "getInitiative",
+  "queryMemories",
+  "request",
+]);
 
 async function check(records, clientName, code, operation) {
   try {
@@ -11,11 +20,11 @@ async function check(records, clientName, code, operation) {
 
 export async function runRuntimeClientConformance({ createClients } = {}) {
   if (typeof createClients !== "function") {
-    return { schema_version: "1", tool: "house-conformance", profile: "runtime-client:candidate-v1", ok: false, input_error: true, records: [], error: "createClients is required" };
+    return { schema_version: "1", tool: "house-conformance", profile: "runtime-client:candidate-v2", ok: false, input_error: true, records: [], error: "createClients is required" };
   }
   const entries = await createClients();
   if (!Array.isArray(entries) || entries.length < 2) {
-    return { schema_version: "1", tool: "house-conformance", profile: "runtime-client:candidate-v1", ok: false, input_error: true, records: [], error: "at least two independently configured clients are required" };
+    return { schema_version: "1", tool: "house-conformance", profile: "runtime-client:candidate-v2", ok: false, input_error: true, records: [], error: "at least two independently configured clients are required" };
   }
 
   const records = [];
@@ -36,9 +45,15 @@ export async function runRuntimeClientConformance({ createClients } = {}) {
       const repeated = await client.submit(input);
       if (submitted?.run_id !== repeated?.run_id || submitted?.status !== "completed") throw new Error("submit must preserve Runtime idempotency");
     });
-    await check(records, name, "C04_READ_AFTER_WRITE", async () => {
+    await check(records, name, "C04_LIST_AND_READ_AFTER_WRITE", async () => {
+      const runs = await client.listRuns({ status: "completed", limit: 20 });
+      if (!Array.isArray(runs) || !runs.some((run) => run.run_id === submitted.run_id)) throw new Error("completed Run is not present in run.list");
       const run = await client.getRun(submitted.run_id);
       if (run?.run_id !== submitted.run_id || run?.result?.evidence_bundle_id == null) throw new Error("completed Run is not readable with Evidence linkage");
+      const evidence = await client.getEvidence(submitted.run_id);
+      if (evidence?.evidence_bundle_id !== run.result.evidence_bundle_id) throw new Error("Evidence readback does not match the completed Run");
+      const initiative = await client.getInitiative(submitted.run_id);
+      if (initiative?.initiative_id == null) throw new Error("Initiative readback is missing");
       const memories = await client.queryMemories({ subjectId: "agent:lantern", limit: 20, includeQuarantined: false });
       if (!Array.isArray(memories)) throw new Error("memory query must return an array");
     });
@@ -66,7 +81,7 @@ export async function runRuntimeClientConformance({ createClients } = {}) {
   return {
     schema_version: "1",
     tool: "house-conformance",
-    profile: "runtime-client:candidate-v1",
+    profile: "runtime-client:candidate-v2",
     ok: records.length === entries.length * 6 && records.every((record) => record.ok),
     records,
     summary: { clients_checked: entries.length, checks_run: records.length, checks_failed: records.filter((record) => !record.ok).length },
