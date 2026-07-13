@@ -2,7 +2,7 @@
 
 House Toolkit provides local auditing and conformance commands for persistent agent systems. It validates evidence boundaries, initiative completion, and repository privacy without starting an agent runtime or uploading inspected files.
 
-This repository is experimental. Exit codes and report formats are compatibility surfaces; individual detection rules may become stricter when fixtures and release notes explain the change.
+This repository is experimental. The v0.2 exit codes and report formats are compatibility surfaces; individual detection rules may become stricter when fixtures and release notes explain the change.
 
 ## House open-source stack
 

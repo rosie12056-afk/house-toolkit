@@ -2,12 +2,12 @@
 
 ## Current release
 
-House Toolkit `v0.2.0-rc.1` depends on the exact Git tag `house-protocols#v0.2.0-rc.1`. Its lockfile resolves that tag to a commit SHA. The Toolkit exposes separate `0.1` and `0.2` profiles.
+House Toolkit `v0.2.0` depends on the exact Git tag `house-protocols#v0.2.0`. Its lockfile resolves that tag to a commit SHA. The Toolkit exposes separate `0.1` and `0.2` profiles.
 
 | Toolkit | Protocols package | Document profile | Node.js | Status |
 | --- | --- | --- | --- | --- |
 | `v0.1.1` | exact `v0.1.1` | `0.1` | 20, 22, 24 | Tested |
-| `v0.2.0-rc.1` | exact `v0.2.0-rc.1` | separate `0.1` and `0.2` profiles | 20, 22, 24 | Release candidate |
+| `v0.2.0` | exact `v0.2.0` | separate `0.1` and `0.2` profiles | 20, 22, 24 | Tested and released |
 
 ## Upgrade rules
 
