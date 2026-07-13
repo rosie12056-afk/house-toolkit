@@ -29,7 +29,7 @@
     "check": "npm test && npm run scan:self"
   },
   "dependencies": {
-    "house-protocols": "github:rosie12056-afk/house-protocols#t4-portability"
+    "house-protocols": "github:rosie12056-afk/house-protocols#74dde65"
   },
   "engines": {
     "node": ">=20"
