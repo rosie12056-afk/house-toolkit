@@ -1,6 +1,6 @@
 {
   "name": "house-toolkit",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Local auditing and conformance tools for persistent agent systems.",
   "type": "module",
   "license": "Apache-2.0",
@@ -21,7 +21,8 @@
     "COMPATIBILITY.md",
     "PUBLICATION-PROFILE.md",
     "LICENSE",
-    "NOTICE"
+    "NOTICE",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "test": "node --test",
@@ -29,7 +30,7 @@
     "check": "npm test && npm run scan:self"
   },
   "dependencies": {
-    "house-protocols": "github:rosie12056-afk/house-protocols#v0.2.1"
+    "house-protocols": "github:rosie12056-afk/house-protocols#v0.2.2"
   },
   "engines": {
     "node": ">=20"
