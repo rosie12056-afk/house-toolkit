@@ -1,6 +1,6 @@
 # Compatibility
 
-## Current release
+## Released lifecycle baseline
 
 House Toolkit `v0.2.1` depends on the exact Git tag `house-protocols#v0.2.1`. Its lockfile resolves that tag to a commit SHA. The Toolkit retains the `0.1` and `0.2` profiles and adds lifecycle conformance for additive `0.2` contracts.
 
@@ -21,3 +21,7 @@ House Toolkit `v0.2.1` depends on the exact Git tag `house-protocols#v0.2.1`. It
 - Exit code `0` means the selected rules passed, `1` means findings exist, and `2` means the input or invocation is unusable. This contract remains stable within each published compatibility line.
 
 House Toolkit is a development dependency of House Runtime `v0.1.0-alpha.1`; it is not loaded by the Runtime in production execution.
+
+## September 2026 maintenance
+
+Package `0.3.0-rc.4` follows `0.3.0-rc.3` with unchanged document profiles and storage semantics. Its exact dependency tags are `house-protocols#v0.3.0-rc.3`. Use the committed root lockfile; downstream projects must update their own locks. See [CHANGELOG.md](CHANGELOG.md).

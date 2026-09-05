@@ -1,5 +1,7 @@
 # House Toolkit
 
+Maintenance release `0.3.0-rc.4` preserves the existing maturity and document profiles. See [CHANGELOG.md](CHANGELOG.md) for dependency changes and consumer lockfile guidance.
+
 House Toolkit provides local auditing and conformance commands for persistent agent systems. It validates evidence boundaries, initiative completion, and repository privacy without starting an agent runtime or uploading inspected files.
 
 This repository is experimental. The v0.2 exit codes and report formats are compatibility surfaces; individual detection rules may become stricter when fixtures and release notes explain the change.
